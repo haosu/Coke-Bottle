@@ -8,8 +8,9 @@ window.onload = function() {
   bottle.createBottle();
   bottle.createWaves();
   bottle.maskWaves();
-  bottle.animateWaves();
+  bottle.createHighlights();
+  //bottle.animateWaves();
   bottle.growWaves(500);
 
-  bottle.startBubbles();
+  //bottle.startBubbles();
 }
