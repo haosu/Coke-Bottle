@@ -156,7 +156,7 @@ CokeBottle.Bottle = function(){ return {
   },
 
   stackWave : function(dx, color) {
-    var attr = {fill:color, stroke:0}
+    var attr = {fill:color, stroke:0, opacity:0.4}
     var wave = this.createWave(attr, 500, 1, 25);
     wave.animate();
     this.waves.push(wave);
@@ -216,6 +216,28 @@ CokeBottle.Bubble = function(){ return {
     return bubble;
   }
 
+};};
+
+CokeBottle.WaveLabel = function(){ return{
+  textValue : "",
+  imgUrl : "",
+
+  text : {},
+  img : {},
+
+  initialize : function(text, imgUrl) {
+    this.textValue = text;
+    this.imgUrl = imgUrl;
+  },
+
+  draw : function() {
+    this.text = CokeBottle.Utils.paper.text(this.textValue);
+    this.img = CokeBottle.Utils.paper.image(this.imgUrl);
+  },
+
+  move : function(dx) {
+
+  }
 };};
 
 CokeBottle.Utils = {
