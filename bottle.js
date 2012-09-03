@@ -39,7 +39,7 @@ CokeBottle.Wave = function() { return {
   },
 
   raiseWave : function(height) {
-    this.baseHeight -= height;
+    this.baseHeight -= (height*this.incrementRate);
     // taking path from wave's path attribute
     var pathArr = [];
     var path = this.wave.attr("path");
@@ -52,12 +52,15 @@ CokeBottle.Wave = function() { return {
       }
     }
 
+    /*
     this.wave.animate({
       path :
         this.head_str + 
         CokeBottle.Utils.createPathString(this.base_arr, 0, this.baseHeight, 0, 0) +
         this.tail_str
       }, 1);
+
+      */
   }
 };};
 
@@ -68,16 +71,32 @@ CokeBottle.Bottle = function(){ return {
   outline : {},
   highlights : [],
 
+  paperBlock : {},
+  clipPath : {},
+  clipShape : {},
+
+
   waveCount : 5,
 
   initialize : function() {
-    
   },
 
   createBottle : function() {
     this.outline = 
       CokeBottle.Utils.paper.path(this.outline_str)
         .attr({fill:"red", stroke:"#eee", "stroke-width":10, "stroke-opacity":1});
+
+    this.paperBlock = $(CokeBottle.Utils.paper.canvas);
+
+    // clipping mask
+    this.clipPath = CokeBottle.Utils.makeSVG("clipPath", {id:"clipping"});
+    this.clipShape = CokeBottle.Utils.makeSVG("path", {
+      x:0, y:0, 
+      fill:"#000",
+      d:"M157.936,450.649c-3.084-12.037-10.841-35.258-12.159-45.696 c-0.805-6.376-0.236-25.188,0-31.543c0.235-6.357,10.819-71.553,10.582-79.569c-0.161-5.433-1.88-7.768-1.175-15.537 c0.705-7.769,2.352-20.48,1.646-28.249c-0.706-7.769-1.41-19.304-2.116-24.718c-0.706-5.415-3.998-19.068-5.174-24.717 c-1.177-5.649-1.882-6.827-1.882-11.77c0-4.944,0-13.183-0.941-15.536c-0.941-2.355-22.104-55.555-24.691-64.031 c-2.587-8.474-5.173-23.304-5.878-31.779c-0.707-8.474-1.882-24.954-1.882-28.013c0-3.06,1.646-4.708,3.762-7.532 c2.118-2.826,2.118-8.24,0.236-11.536c-1.882-3.296-3.292-7.062-3.528-8.71c-0.235-1.648,0.393-1.863,0.706-4.944 c0.21-2.062,0.229-3.832-1.411-6.591C112.5,7.604,108.151,5,108.151,5H56.004c0,0-4.349,2.604-5.88,5.178 c-1.64,2.759-1.621,4.529-1.411,6.591c0.312,3.081,0.941,3.296,0.706,4.944c-0.236,1.648-1.646,5.414-3.528,8.71 c-1.881,3.295-1.881,8.709,0.235,11.536c2.116,2.824,3.763,4.472,3.763,7.532c0,3.06-1.176,19.539-1.881,28.013 c-0.706,8.475-3.292,23.305-5.88,31.779c-2.587,8.476-23.75,61.676-24.69,64.031c-0.941,2.353-0.942,10.591-0.942,15.536 c0,4.943-0.706,6.121-1.881,11.77s-4.468,19.303-5.173,24.717c-0.706,5.414-1.41,16.949-2.115,24.718 c-0.706,7.768,0.94,20.48,1.645,28.249c0.706,7.769-1.014,10.104-1.176,15.537c-0.236,8.017,10.348,73.212,10.583,79.569 c0.236,6.355,0.805,25.167,0,31.543c-1.317,10.438-9.074,33.659-12.159,45.696c-3.653,14.257,1.07,29.812,11.924,40.463 C28.164,500.943,48.426,505,62.826,505h38.503c14.401,0,34.662-4.057,44.683-13.888 C156.866,480.462,161.589,464.906,157.936,450.649z"
+    });
+    $(this.clipPath).append(this.clipShape);
+    this.paperBlock.append(this.clipPath);
   },
 
   createHighlights : function() {
@@ -111,30 +130,16 @@ CokeBottle.Bottle = function(){ return {
     }
   },
 
-  createWave : function(attr) {
+  createWave : function(attr, x, incrementRate, variance) {
     var wave = new CokeBottle.Wave();
-    wave.initialize(attr, 500, 1, 25);
+    wave.initialize(attr, x, incrementRate, variance);
     wave.create();
+    this.maskWave(wave);
     return wave;
   },
 
-  maskWaves : function() {
-    var paperBlock = $(CokeBottle.Utils.paper.canvas);
-
-    // clipping mask
-    var clipPath = CokeBottle.Utils.makeSVG("clipPath", {id:"clipping"});
-    var clipShape = CokeBottle.Utils.makeSVG("path", {
-      x:0, y:0, 
-      fill:"#000",
-      d:"M157.936,450.649c-3.084-12.037-10.841-35.258-12.159-45.696 c-0.805-6.376-0.236-25.188,0-31.543c0.235-6.357,10.819-71.553,10.582-79.569c-0.161-5.433-1.88-7.768-1.175-15.537 c0.705-7.769,2.352-20.48,1.646-28.249c-0.706-7.769-1.41-19.304-2.116-24.718c-0.706-5.415-3.998-19.068-5.174-24.717 c-1.177-5.649-1.882-6.827-1.882-11.77c0-4.944,0-13.183-0.941-15.536c-0.941-2.355-22.104-55.555-24.691-64.031 c-2.587-8.474-5.173-23.304-5.878-31.779c-0.707-8.474-1.882-24.954-1.882-28.013c0-3.06,1.646-4.708,3.762-7.532 c2.118-2.826,2.118-8.24,0.236-11.536c-1.882-3.296-3.292-7.062-3.528-8.71c-0.235-1.648,0.393-1.863,0.706-4.944 c0.21-2.062,0.229-3.832-1.411-6.591C112.5,7.604,108.151,5,108.151,5H56.004c0,0-4.349,2.604-5.88,5.178 c-1.64,2.759-1.621,4.529-1.411,6.591c0.312,3.081,0.941,3.296,0.706,4.944c-0.236,1.648-1.646,5.414-3.528,8.71 c-1.881,3.295-1.881,8.709,0.235,11.536c2.116,2.824,3.763,4.472,3.763,7.532c0,3.06-1.176,19.539-1.881,28.013 c-0.706,8.475-3.292,23.305-5.88,31.779c-2.587,8.476-23.75,61.676-24.69,64.031c-0.941,2.353-0.942,10.591-0.942,15.536 c0,4.943-0.706,6.121-1.881,11.77s-4.468,19.303-5.173,24.717c-0.706,5.414-1.41,16.949-2.115,24.718 c-0.706,7.768,0.94,20.48,1.645,28.249c0.706,7.769-1.014,10.104-1.176,15.537c-0.236,8.017,10.348,73.212,10.583,79.569 c0.236,6.355,0.805,25.167,0,31.543c-1.317,10.438-9.074,33.659-12.159,45.696c-3.653,14.257,1.07,29.812,11.924,40.463 C28.164,500.943,48.426,505,62.826,505h38.503c14.401,0,34.662-4.057,44.683-13.888 C156.866,480.462,161.589,464.906,157.936,450.649z"
-    });
-    $(clipPath).append(clipShape);
-    paperBlock.append(clipPath);
-
-    // apply mask
-    for(var i=0; i < this.waveCount; i ++) {
-      $(this.waves[i].wave.node).attr({"clip-path":"url(#clipping)"});
-    }
+  maskWave : function(wave) {
+    $(wave.wave.node).attr({"clip-path":"url(#clipping)"});
   },
 
   animateWaves : function() {
@@ -145,8 +150,19 @@ CokeBottle.Bottle = function(){ return {
 
   growWaves : function(dx) {
     for(var i=0; i<this.waveCount; i++) {
-      this.waves[i].raiseWave(dx*(1-0.1*i));
+      //this.waves[i].raiseWave(dx*(1-0.1*i));
+      this.waves[i].raiseWave(dx);
     }
+  },
+
+  stackWave : function(dx, color) {
+    var attr = {fill:color, stroke:0}
+    var wave = this.createWave(attr, 500, 1, 25);
+    wave.animate();
+    this.waves.push(wave);
+    this.waveCount ++;
+
+    this.growWaves(dx);
   },
 
   startBubbles : function() {

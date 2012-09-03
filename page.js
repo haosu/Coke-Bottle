@@ -7,10 +7,11 @@ window.onload = function() {
 
   bottle.createBottle();
   bottle.createWaves();
-  bottle.maskWaves();
   bottle.createHighlights();
-  //bottle.animateWaves();
+  bottle.animateWaves();
   bottle.growWaves(500);
+
+  //bottle.stackWave(300, "blue");
 
   //bottle.startBubbles();
 }
